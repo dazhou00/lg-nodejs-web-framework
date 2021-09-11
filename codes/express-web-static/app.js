@@ -24,6 +24,7 @@ app.set("view engine", "html");
 app.use(
   "/foo",
   express.static(path.join(__dirname, "./public"), {
+    // index: false,// 禁止默认加载 index.html
     index: ["index.html"],
   })
 );
