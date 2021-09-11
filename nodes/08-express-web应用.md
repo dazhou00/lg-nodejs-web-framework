@@ -81,7 +81,7 @@ const todos = [
 
 ```js
 let str = "";
-todos.forEach((todo) => {
+todos.forEach(todo => {
   str += `<li>${todo.title}</li>`;
 });
 ```
@@ -111,14 +111,77 @@ res.send(data.replace("^_^", str));
 
 ### 基本用法
 
+要提供静态文件（例如图像，CSS 文件和 JavaScript 文件），请使用 Express 中的 `express.static` 内置中间件功能。
+
+```js
+express.static(root, [options]);
+
+//root 参数指定用于从其提供静态资产的根目录。有关 options 参数的更多信息，请参见 express.static。
+```
+
+- 例如，使用以下代码在名为 public 的目录中提供图像，CSS 文件和 JavaScript 文件：
+
+```js
+app.use(express.static("public"));
+
+//现在，您可以加载 public 目录中的文件：
+// http://localhost:3000/images/kitten.jpg
+// http://localhost:3000/css/style.css
+// http://localhost:3000/js/app.js
+// http://localhost:3000/images/bg.png
+// http://localhost:3000/hello.html
+```
+
+> Express 查找相对于静态目录的文件，因此静态目录的名称不是 URL 的一部分。
+
 ### 托管多个静态资源
+
+要使用多个静态资源目录，请多次调用 express.static 中间件函数：
+
+```js
+app.use(express.static("public"));
+app.use(express.static("files"));
+```
+
+Express 使用 express.static 中间件功能按设置静态目录的顺序查找文件。
+
+> 注意：为了获得最佳结果，请使用反向代理缓存来提高服务器静态资源的性能。
 
 ### 虚拟路径
 
+要为 express.static 函数提供服务的文件创建虚拟路径前缀（文件系统中实际上不存在该路径），请为静态目录指定安装路径，如下所示：
+
+```js
+app.use("/static", express.static("public"));
+
+// 现在，您可以从/ static路径前缀加载公共目录中的文件。
+
+// http://localhost:3000/static/images/kitten.jpg
+// http://localhost:3000/static/css/style.css
+// http://localhost:3000/static/js/app.js
+// http://localhost:3000/static/images/bg.png
+// http://localhost:3000/static/hello.html
+```
+
 ### 托管资源路径问题
+
+但是，您提供给 express.static 函数的路径是相对于您启动节点进程的目录的。如果您从另一个目录运行 Express App，则使用要提供服务的目录的绝对路径更为安全：
+
+```js
+app.use("/static", express.static(path.join(__dirname, "public")));
+```
 
 ### 页面中的资源请求路径问题
 
-```
+```js
+<!-- 绝对地址路径 -->
+<link rel="stylesheet" href="http://example.com/xxx.css">
 
+<!-- 绝对路径，当前网页主机地址 -->
+<link rel="stylesheet" href="/xxx.css">
+
+<!-- 相对路径，相对于当前网页 url -->
+<link rel="stylesheet" href="xxx.css">
+<link rel="stylesheet" href="./xxx.css">
+<link rel="stylesheet" href="../xxx.css">
 ```
